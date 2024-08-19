@@ -3,7 +3,6 @@ import '../pages/index.css';
 import { openModal, closeModal } from './modal.js';
 import { likeButton, deleteCard, createCard } from './card.js';
 
-
 // Темплейт карточки
 
 export const container = document.querySelector('#card-template').content;
