@@ -46,6 +46,7 @@ buttonEditProfile.addEventListener('click', function() {
   openModal(profilePopup);
   nameInput.value = nameTitle.textContent;
   jobInput.value = jobTitle.textContent;
+  clearValidation(formEditProfile);
 });
 
 buttonAddProfile.addEventListener('click', function() {
@@ -120,6 +121,7 @@ function handleFormAddCard(evt) {
   cardList.prepend(newCard);
 
   formAddProfile.reset();
+
   closeModal(newCardPopup);
 }
 
@@ -136,8 +138,7 @@ function openPopupImage(item) {
   openModal(popupImage);
 }
 
-______________________________________________________________________________________
-
+//_______________________________________________________________________________________
 
 
 
@@ -175,7 +176,7 @@ const hideInputError = function(form, input) {
 // Проверить инпут на валидность
 
 const isValid = function(form, input) {
-  if (input.validity.patterMismatch) {
+  if (input.validity.patternMismatch) {
     input.setCustomValidity(input.dataset.error);
   } else {
     input.setCustomValidity('');
@@ -187,7 +188,7 @@ const isValid = function(form, input) {
   }
 };
 
-// Проверить невалидность одного из инпута
+// Проверить невалидность одного из инпутов
 
 const hasInvalidInput = function(inputList) {
   return inputList.some(function(input) {
@@ -212,6 +213,7 @@ const toggleButtonState = function(inputList, button) {
 const setEventListeners = function(form) {
   const inputList = Array.from(form.querySelectorAll(validationConfig.inputSelector));
   const button = form.querySelector(validationConfig.submitButtonSelector);
+  toggleButtonState(inputList, button);
   inputList.forEach(function(input) {
     input.addEventListener('input', function() {
       isValid(form, input);
@@ -228,3 +230,24 @@ const enableValidation = function() {
 };
 
 enableValidation();
+
+// Очистка ошибок валидации с прошлого открытия
+
+function clearValidation(form) {
+  const inputList = Array.from(form.querySelectorAll(validationConfig.inputSelector));
+  const button = form.querySelector(validationConfig.submitButtonSelector);
+  inputList.forEach(function(input) {
+    hideInputError(form, input);
+  });
+
+  toggleButtonState(inputList, button);
+};
+
+
+
+
+
+
+
+
+

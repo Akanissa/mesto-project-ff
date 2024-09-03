@@ -41,7 +41,7 @@
           minlength="2"
           maxlength="40"
           pattern="^[а-яА-ЯёЁa-zA-Z\s\-]+$"
-          data-error="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
+          data-error="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы."
           id="name"
           type="text" 
           name="name" 
@@ -53,7 +53,7 @@
           minlength="2" 
           maxlength="200"
           pattern="^[а-яА-ЯёЁa-zA-Z\s\-]+$"
-          data-error="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы"
+          data-error="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы."
           id="description"
           type="text" 
           name="description"
@@ -70,8 +70,27 @@
       <button type="button" class="popup__close"></button>
       <h3 class="popup__title">Новое место</h3>
       <form class="popup__form" name="new-place">
-        <input type="text" name="place-name" class="popup__input popup__input_type_card-name" placeholder="Название" required>
-        <input type="url" name="link" class="popup__input popup__input_type_url" placeholder="Ссылка на картинку" required>
+        <input 
+          minlength="2"
+          maxlength="30"
+          pattern="^[а-яА-ЯёЁa-zA-Z\s\-]+$"
+          data-error="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы."
+          id="place-name"
+          type="text" 
+          name="place-name" 
+          class="popup__input popup__input_type_card-name" 
+          placeholder="Название" 
+          required>
+        <span class="form__input-error place-name__input-error" id="place-name-error"></span>
+        <input 
+          pattern="^https://\S\.[jpg|jpeg|png|gif]+$"
+          id="image-url"
+          type="url" 
+          name="link" 
+          class="popup__input popup__input_type_url" 
+          placeholder="Ссылка на картинку" 
+          required>
+        <span class="form__input-error image-url__input-error" id="image-url-error"></span>
         <button type="submit" class="button popup__button">Сохранить</button>
       </form>
     </div>

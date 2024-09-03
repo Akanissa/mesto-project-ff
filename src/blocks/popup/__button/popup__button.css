@@ -21,8 +21,9 @@
 
 .button__inactive {
   background: white;
-  color: rgba(0, 0, 0, 0.8);
-  border: 1px solid rgba(0, 0, 0, 0.8);
+  color: rgba(0, 0, 0);
+  border: 1px solid rgba(0, 0, 0);
+  opacity: 0.2;
   pointer-events: none;
 }
 
