@@ -1,7 +1,8 @@
 import { initialCards } from './cards.js';
 import '../pages/index.css';
 import { openModal, closeModal } from './modal.js';
-import { likeButton, deleteCard, createCard } from './card.js';
+import { likeButton, createCard } from './card.js';
+import { validationConfig, enableValidation, clearValidation } from './validation.js';
 
 // Переменные
 
@@ -24,6 +25,14 @@ const nameTitle = document.querySelector('.profile__title');
 const jobTitle = document.querySelector('.profile__description');
 const image = document.querySelector('.popup__image');
 const name = document.querySelector('.popup__caption');
+const avatarImage = document.querySelector('.profile__image');
+// const cardTitle = document.querySelectorAll('.card__title');
+// const cardImage = document.querySelectorAll('.card__image');
+
+const avatarPopup = document.querySelector('.popup_type_avatar');
+const formAvatar = document.forms['edit-avatar'];
+// const avatarUrlInput = document.querySelector('.popup__input_type_url');
+
 
 // Темплейт карточки
 
@@ -33,25 +42,38 @@ export const container = document.querySelector('#card-template').content;
 
 const cardList = document.querySelector('.places__list');
 
-// Вывести карточки на страницу
-
-initialCards.forEach(function(item) {
-  const card = createCard(item, deleteCard, likeButton, openPopupImage);
-  cardList.append(card);
-});
-
 // Слушатели открытия модального окна
 
 buttonEditProfile.addEventListener('click', function() {
+  clearValidation(formEditProfile, validationConfig);
   openModal(profilePopup);
   nameInput.value = nameTitle.textContent;
   jobInput.value = jobTitle.textContent;
-  clearValidation(formEditProfile);
 });
 
 buttonAddProfile.addEventListener('click', function() {
+  clearValidation(newCardPopup, validationConfig);
+  cardNameInput.value = "";
+  cardLinkInput.value = "";
   openModal(newCardPopup);
 });
+
+avatarImage.addEventListener('click', function() {
+  clearValidation(avatarPopup, validationConfig);  
+  cardLinkInput.value = "";
+  openModal(avatarPopup);
+});
+
+// Открытие модального окна с картинкой
+
+function openPopupImage(item) {
+
+  name.textContent = item.name;
+  image.src = item.link;
+  image.alt = item.name;
+
+  openModal(popupImage);
+}
 
 // Слушатели закрытия модального окна
 
@@ -98,6 +120,16 @@ function handleFormEditProfile(evt) {
   nameTitle.textContent = nameValue; // Вставьте новые значения с помощью textContent
   jobTitle.textContent = jobValue;
 
+  updateUserInfo(nameValue, jobValue) // Обновление данных  после нажатия кнопки 'Сохранить' и вывод их в консоль
+    .then((userInfo) => {
+      userInfo.name = nameTitle.textContent;
+      userInfo.about = jobTitle.textContent;
+      console.log('Данные пользователя обновлены:', userInfo);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
   closeModal(profilePopup);
 }
 
@@ -109,145 +141,237 @@ function handleFormAddCard(evt) {
   evt.preventDefault();
 
   const nameValue = cardNameInput.value;
-  const linkValue = cardLinkInput.value;
+  const linkValue = cardLinkInput.value; 
 
   const card = {
     name: nameValue,
     link: linkValue
   }
 
-  const newCard = createCard(card, deleteCard, likeButton, openPopupImage);
-
-  cardList.prepend(newCard);
-
-  formAddProfile.reset();
-
-  closeModal(newCardPopup);
+  addNewCard(nameValue, linkValue)
+  .then((card) => {
+    const newCard = createCard(card, deleteCard, likeButton, openPopupImage, card.owner._id);
+    cardList.prepend(newCard);
+    formAddProfile.reset();
+    closeModal(newCardPopup);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 }
 
 formAddProfile.addEventListener('submit', handleFormAddCard);
 
-// Открытие модального окна с картинкой
+// Редактирование аватара
 
-function openPopupImage(item) {
+function editAvatar(evt) {
+  evt.preventDefault();
 
-  name.textContent = item.name;
-  image.src = item.link;
-  image.alt = item.name;
+  const avatarValue = cardLinkInput.value;
 
-  openModal(popupImage);
+  updateUserAvatar(avatarValue)
+    .then((userInfo) => {
+      avatarImage.setAttribute('style', `background-image: url('${userInfo.avatar}')`);
+      closeModal(avatarPopup);
+    })  
+    .catch((err) => {
+      console.log(err);
+    });
+
+  enableValidation();
 }
 
-//_______________________________________________________________________________________
+formAvatar.addEventListener('submit', editAvatar);
 
-
-
-
-
-// Валидация формы
-
-const validationConfig = {
-  formSelector: '.popup__form',
-  inputSelector: '.popup__input',
-  submitButtonSelector: '.popup__button',
-  inactiveButtonClass: 'popup__button_disabled',
-  inputErrorClass: 'popup__input_type_error',
-  errorClass: 'popup__error_visible'
-}; 
-
-// Показать ошибку ввода
-
-const showInputError = function(form, input, errorMessage) {
-  const error = form.querySelector(`.${input.id}__input-error`);
-  input.classList.add(validationConfig.inputErrorClass);
-  error.textContent = errorMessage;
-  error.classList.add(validationConfig.errorClass);
-};
-
-// Спрятать ошибку ввода
-
-const hideInputError = function(form, input) {
-  const error = form.querySelector(`.${input.id}__input-error`);
-  input.classList.remove(validationConfig.inputErrorClass);
-  error.classList.remove(validationConfig.errorClass);
-  error.textContent = '';
-};
-
-// Проверить инпут на валидность
-
-const isValid = function(form, input) {
-  if (input.validity.patternMismatch) {
-    input.setCustomValidity(input.dataset.error);
-  } else {
-    input.setCustomValidity('');
-  }
-  if (!input.validity.valid) {
-    showInputError(form, input, input.validationMessage);
-  } else {
-    hideInputError(form, input);
-  }
-};
-
-// Проверить невалидность одного из инпутов
-
-const hasInvalidInput = function(inputList) {
-  return inputList.some(function(input) {
-    return !input.validity.valid;
-  })
-};
-
-// Изменить кликабельность кнопки
-
-const toggleButtonState = function(inputList, button) {
-  if (hasInvalidInput(inputList)) {
-    button.disabled = true;
-    button.classList.add('button__inactive');
-  } else {
-    button.disabled = false;
-    button.classList.remove('button__inactive');
-  }
-};
-
-// Слушатели событий инпутов
-
-const setEventListeners = function(form) {
-  const inputList = Array.from(form.querySelectorAll(validationConfig.inputSelector));
-  const button = form.querySelector(validationConfig.submitButtonSelector);
-  toggleButtonState(inputList, button);
-  inputList.forEach(function(input) {
-    input.addEventListener('input', function() {
-      isValid(form, input);
-      toggleButtonState(inputList, button);
-    });
-  });
-};
-
-const enableValidation = function() {
-  const formList = Array.from(document.querySelectorAll(validationConfig.formSelector));
-  formList.forEach(function(form) {
-    setEventListeners(form);
-  });
-};
+// Вызов функции валидации
 
 enableValidation();
 
-// Очистка ошибок валидации с прошлого открытия
+//_________________________________________________________________________
 
-function clearValidation(form) {
-  const inputList = Array.from(form.querySelectorAll(validationConfig.inputSelector));
-  const button = form.querySelector(validationConfig.submitButtonSelector);
-  inputList.forEach(function(input) {
-    hideInputError(form, input);
-  });
 
-  toggleButtonState(inputList, button);
+
+// Данные для API
+
+const config = {
+  cohort: 'https://nomoreparties.co/v1/wff-cohort-22',
+  headers: {
+    authorization: 'dbc8d628-1ef0-4991-a7d3-2138c077d5c9',
+    'Content-Type': 'application/json'
+  }
+}
+
+// Загрузка информации о пользователе с сервера
+
+const getUserInfo = function() {
+  return fetch(`${config.cohort}/users/me`, {
+    method: 'GET',
+    headers: config.headers
+  })
+  .then((res) => {
+    if (res.ok) {
+      return res.json();
+    }
+    return Promise.reject(`${res.status}`);
+  })
+  .catch((err) => {
+    console.log(err);
+  })
+}
+
+// Обновление данных пользователя на сервере
+
+const updateUserInfo = function(name, about) {
+  return fetch(`${config.cohort}/users/me`, {
+    method: 'PATCH',
+    headers: config.headers,
+    body: JSON.stringify({
+      name,
+      about
+    })
+  })
+  .then((res) => {
+    if (res.ok) {
+      return res.json();
+    }
+    return Promise.reject(`${res.status}`);
+  })
+  .catch((err) => {
+    console.log(err);
+  })
+}
+
+// Загрузка карточек с сервера
+
+const getCardsInfo = function() {
+  return fetch(`${config.cohort}/cards`, {
+    method: 'GET',
+    headers: config.headers
+  })
+  .then((res) => {
+    if (res.ok) {
+      return res.json();
+    }
+    return Promise.reject(`${res.status}`);
+  })
+  .catch((err) => {
+    console.log(err);
+  })
+}
+
+// Добавление новой карточки на сервер
+
+const addNewCard = function(name, link) {
+  return fetch(`${config.cohort}/cards`, {
+    method: 'POST',
+    headers: config.headers,
+    body: JSON.stringify({
+      name,
+      link
+    })
+  })
+  .then((res) => {
+    if (res.ok) {
+      return res.json();
+    }
+    return Promise.reject(`${res.status}`);
+  })
+  .catch((err) => {
+    console.log(err);
+  })
+}
+
+// Вывод массива с информацией о пользователе и карточках
+
+const promises = [getUserInfo(), getCardsInfo()];
+
+Promise.all(promises)
+  .then(([userInfo, cardsInfo]) => {
+
+    const userId = userInfo._id;
+
+    nameTitle.textContent = userInfo.name;
+    jobTitle.textContent = userInfo.about;
+
+    cardsInfo.forEach((card) => {
+      const newCard = createCard(card, deleteCard, likeButton, openPopupImage, userId);
+      cardList.append(newCard);
+    });
+
+    console.log({ userInfo, cardsInfo });
+  })
+  .catch((err) => {
+    console.log(err);
+  })
+
+// удаление карточки по id
+
+export const deleteCard = function(_id, card) {
+  return fetch(`${config.cohort}/cards/${_id}`, {
+    method: 'DELETE', 
+    headers: config.headers
+  })
+  .then(() => {
+    card.remove();
+  })
+  .catch((err) => {
+    console.log(err);
+  })
 };
 
+// Добавление лайка карточки
 
+export const addCardLike = function(_id) {
+  return fetch(`${config.cohort}/cards/likes/${_id}`, {
+    method: 'PUT', 
+    headers: config.headers
+  })
+  .then((res) => {
+    if (res.ok) {
+      return res.json();
+    }
+    return Promise.reject(`${res.status}`);
+  })
+  .catch((err) => {
+    console.log(err);
+  })
+}
 
+// Удаление лайка карточки
 
+export const deleteCardLike = function(_id) {
+  return fetch(`${config.cohort}/cards/likes/${_id}`, {
+    method: 'DELETE', 
+    headers: config.headers
+  })
+  .then((res) => {
+    if (res.ok) {
+      return res.json();
+    }
+    return Promise.reject(`${res.status}`);
+  })
+  .catch((err) => {
+    console.log(err);
+  })
+}
 
+// Обновление аватара пользователя
 
-
-
-
+const updateUserAvatar = function(avatar) {
+  return fetch(`${config.cohort}/users/me/avatar`, {
+    method: 'PATCH',
+    headers: config.headers,
+    body: JSON.stringify({
+      avatar
+    })
+  })
+  .then((res) => {
+    if (res.ok) {
+      return res.json();
+    }
+    return Promise.reject(`${res.status}`);
+  })
+  .catch((err) => {
+    console.log(err);
+  })
+}
