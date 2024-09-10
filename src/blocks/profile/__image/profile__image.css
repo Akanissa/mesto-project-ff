@@ -37,4 +37,8 @@
   .profile__image {
     margin-right: 0;
   }
+
+  .profile__image::after {
+    margin-left: -50%;
+  }
 }

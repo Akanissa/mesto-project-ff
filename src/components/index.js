@@ -1,8 +1,9 @@
-import { initialCards } from './cards.js';
+// import { initialCards } from './cards.js';
 import '../pages/index.css';
 import { openModal, closeModal } from './modal.js';
 import { likeButton, createCard } from './card.js';
 import { validationConfig, enableValidation, clearValidation } from './validation.js';
+import { getUserInfo, updateUserInfo, getCardsInfo, addNewCard, deleteCard, getUserAvatar } from './api.js';
 
 // Переменные
 
@@ -26,12 +27,9 @@ const jobTitle = document.querySelector('.profile__description');
 const image = document.querySelector('.popup__image');
 const name = document.querySelector('.popup__caption');
 const avatarImage = document.querySelector('.profile__image');
-// const cardTitle = document.querySelectorAll('.card__title');
-// const cardImage = document.querySelectorAll('.card__image');
-
 const avatarPopup = document.querySelector('.popup_type_avatar');
 const formAvatar = document.forms['edit-avatar'];
-// const avatarUrlInput = document.querySelector('.popup__input_type_url');
+const avatarUrlInput = document.querySelector('.avatar__input_type_url');
 
 
 // Темплейт карточки
@@ -60,11 +58,11 @@ buttonAddProfile.addEventListener('click', function() {
 
 avatarImage.addEventListener('click', function() {
   clearValidation(avatarPopup, validationConfig);  
-  cardLinkInput.value = "";
+  avatarUrlInput.value = "";
   openModal(avatarPopup);
 });
 
-// Открытие модального окна с картинкой
+// Функция открытия модального окна с картинкой
 
 function openPopupImage(item) {
 
@@ -120,14 +118,18 @@ function handleFormEditProfile(evt) {
   nameTitle.textContent = nameValue; // Вставьте новые значения с помощью textContent
   jobTitle.textContent = jobValue;
 
+  changeButtonText(profilePopup, 'Сохранение...'); // Изменение текста кнопки нажатии на кнопку и загрузке
+
   updateUserInfo(nameValue, jobValue) // Обновление данных  после нажатия кнопки 'Сохранить' и вывод их в консоль
     .then((userInfo) => {
       userInfo.name = nameTitle.textContent;
       userInfo.about = jobTitle.textContent;
       console.log('Данные пользователя обновлены:', userInfo);
+      changeButtonText(profilePopup, 'Сохранить'); // Изменение текста кнопки после загрузки
     })
     .catch((err) => {
       console.log(err);
+      changeButtonText(profilePopup, 'Сохранить');
     });
 
   closeModal(profilePopup);
@@ -148,15 +150,19 @@ function handleFormAddCard(evt) {
     link: linkValue
   }
 
+  changeButtonText(newCardPopup, 'Сохранение...');
+
   addNewCard(nameValue, linkValue)
   .then((card) => {
     const newCard = createCard(card, deleteCard, likeButton, openPopupImage, card.owner._id);
     cardList.prepend(newCard);
     formAddProfile.reset();
     closeModal(newCardPopup);
+    changeButtonText(newCardPopup, 'Создать');
   })
   .catch((err) => {
     console.log(err);
+    changeButtonText(newCardPopup, 'Создать');
   });
 }
 
@@ -164,214 +170,62 @@ formAddProfile.addEventListener('submit', handleFormAddCard);
 
 // Редактирование аватара
 
-function editAvatar(evt) {
+function updateAvatar(evt) {
   evt.preventDefault();
 
-  const avatarValue = cardLinkInput.value;
+  const avatarValue = avatarUrlInput.value;
 
-  updateUserAvatar(avatarValue)
+  changeButtonText(avatarPopup, 'Сохранение...');
+
+  getUserAvatar(avatarValue)
     .then((userInfo) => {
-      avatarImage.setAttribute('style', `background-image: url('${userInfo.avatar}')`);
-      closeModal(avatarPopup);
+      avatarImage.style.backgroundImage = `url(${userInfo.avatar})`;
+      console.log('Аватар пользователя обновлен:', userInfo);
+      changeButtonText(avatarPopup, 'Сохранить');
     })  
     .catch((err) => {
       console.log(err);
+      changeButtonText(avatarPopup, 'Сохранить');
     });
+
+  closeModal(avatarPopup);
 
   enableValidation();
 }
 
-formAvatar.addEventListener('submit', editAvatar);
+formAvatar.addEventListener('submit', updateAvatar);
 
 // Вызов функции валидации
 
 enableValidation();
 
-//_________________________________________________________________________
+// Функция: при нажатии в попапе кнопки 'Сохранить' текст меняется на 'Сохранение...'
 
-
-
-// Данные для API
-
-const config = {
-  cohort: 'https://nomoreparties.co/v1/wff-cohort-22',
-  headers: {
-    authorization: 'dbc8d628-1ef0-4991-a7d3-2138c077d5c9',
-    'Content-Type': 'application/json'
-  }
+function changeButtonText(popup, text) {
+  const submitButton = popup.querySelector('.popup__button');
+  submitButton.textContent = text;
 }
 
-// Загрузка информации о пользователе с сервера
-
-const getUserInfo = function() {
-  return fetch(`${config.cohort}/users/me`, {
-    method: 'GET',
-    headers: config.headers
-  })
-  .then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`${res.status}`);
-  })
-  .catch((err) => {
-    console.log(err);
-  })
-}
-
-// Обновление данных пользователя на сервере
-
-const updateUserInfo = function(name, about) {
-  return fetch(`${config.cohort}/users/me`, {
-    method: 'PATCH',
-    headers: config.headers,
-    body: JSON.stringify({
-      name,
-      about
-    })
-  })
-  .then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`${res.status}`);
-  })
-  .catch((err) => {
-    console.log(err);
-  })
-}
-
-// Загрузка карточек с сервера
-
-const getCardsInfo = function() {
-  return fetch(`${config.cohort}/cards`, {
-    method: 'GET',
-    headers: config.headers
-  })
-  .then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`${res.status}`);
-  })
-  .catch((err) => {
-    console.log(err);
-  })
-}
-
-// Добавление новой карточки на сервер
-
-const addNewCard = function(name, link) {
-  return fetch(`${config.cohort}/cards`, {
-    method: 'POST',
-    headers: config.headers,
-    body: JSON.stringify({
-      name,
-      link
-    })
-  })
-  .then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`${res.status}`);
-  })
-  .catch((err) => {
-    console.log(err);
-  })
-}
-
-// Вывод массива с информацией о пользователе и карточках
+// Массив с информацией о пользователе, карточках и аватаре. Сохранение на сервере
 
 const promises = [getUserInfo(), getCardsInfo()];
 
 Promise.all(promises)
-  .then(([userInfo, cardsInfo]) => {
+.then(([userInfo, cardsInfo]) => {
 
-    const userId = userInfo._id;
+  const userId = userInfo._id;
+  
+  nameTitle.textContent = userInfo.name;
+  jobTitle.textContent = userInfo.about;
+  avatarImage.style.backgroundImage = `url(${userInfo.avatar})`;
 
-    nameTitle.textContent = userInfo.name;
-    jobTitle.textContent = userInfo.about;
+  cardsInfo.forEach((card) => {
+    const newCard = createCard(card, deleteCard, likeButton, openPopupImage, userId);
+    cardList.append(newCard);
+  });
 
-    cardsInfo.forEach((card) => {
-      const newCard = createCard(card, deleteCard, likeButton, openPopupImage, userId);
-      cardList.append(newCard);
-    });
-
-    console.log({ userInfo, cardsInfo });
-  })
-  .catch((err) => {
-    console.log(err);
-  })
-
-// удаление карточки по id
-
-export const deleteCard = function(_id, card) {
-  return fetch(`${config.cohort}/cards/${_id}`, {
-    method: 'DELETE', 
-    headers: config.headers
-  })
-  .then(() => {
-    card.remove();
-  })
-  .catch((err) => {
-    console.log(err);
-  })
-};
-
-// Добавление лайка карточки
-
-export const addCardLike = function(_id) {
-  return fetch(`${config.cohort}/cards/likes/${_id}`, {
-    method: 'PUT', 
-    headers: config.headers
-  })
-  .then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`${res.status}`);
-  })
-  .catch((err) => {
-    console.log(err);
-  })
-}
-
-// Удаление лайка карточки
-
-export const deleteCardLike = function(_id) {
-  return fetch(`${config.cohort}/cards/likes/${_id}`, {
-    method: 'DELETE', 
-    headers: config.headers
-  })
-  .then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`${res.status}`);
-  })
-  .catch((err) => {
-    console.log(err);
-  })
-}
-
-// Обновление аватара пользователя
-
-const updateUserAvatar = function(avatar) {
-  return fetch(`${config.cohort}/users/me/avatar`, {
-    method: 'PATCH',
-    headers: config.headers,
-    body: JSON.stringify({
-      avatar
-    })
-  })
-  .then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`${res.status}`);
-  })
-  .catch((err) => {
-    console.log(err);
-  })
-}
+  console.log({ userInfo, cardsInfo });
+})
+.catch((err) => {
+  console.log(err);
+});

@@ -1,4 +1,5 @@
-import { container, deleteCardLike, addCardLike } from "./index.js";
+import { container } from "./index.js";
+import { deleteCardLike, addCardLike } from "./api.js";
 
 // Функция создания карточки
 
@@ -22,6 +23,7 @@ export function createCard(item, deleteCard, likeButton, openPopupImage, userId,
   }
     
   const deleteButton = card.querySelector('.card__delete-button');
+  
   card.dataset.id = item._id;
 
   if (item.owner._id === userId) {
