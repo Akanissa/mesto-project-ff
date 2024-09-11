@@ -66,7 +66,7 @@ export const getCardsInfo = function() {
   })
 };
 
-// Добавление новой карточки на сервер
+// Добавление новой карточки на сервер//////////////
 
 export const addNewCard = function(name, link) {
   return fetch(`${config.cohort}/cards`, {
