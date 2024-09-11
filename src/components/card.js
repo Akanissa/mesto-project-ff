@@ -1,9 +1,9 @@
 import { container } from "./index.js";
-import { deleteCardLike, addCardLike } from "./api.js";
+import { deleteCardLike, addCardLike, getUserLikes } from "./api.js";
 
 // Функция создания карточки
 
-export function createCard(item, deleteCard, likeButton, openPopupImage, userId, cardId) {
+export function createCard(item, deleteCard, likeButton, openPopupImage, userId) {
 
   const card = container.querySelector('.card').cloneNode(true);
     
@@ -64,14 +64,14 @@ export const likeButton = function(cardLikeCounter, cardLikeButton, item) {
     })
   } else {
     addCardLike(item._id)
-      .then((res) => {
-        if (res) {
-          cardLikeButton.classList.toggle("card__like-button_is-active");
-          cardLikeCounter.textContent = res.likes.length;
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      })
+    .then((res) => {
+      if (res) {
+        cardLikeButton.classList.toggle("card__like-button_is-active");
+        cardLikeCounter.textContent = res.likes.length;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
   }
-}
+};

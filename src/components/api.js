@@ -3,7 +3,7 @@
 const config = {
   cohort: 'https://nomoreparties.co/v1/wff-cohort-22',
   headers: {
-    authorization: 'dbc8d628-1ef0-4991-a7d3-2138c077d5c9',
+    authorization: 'ec4a8345-2acc-4c2a-a578-5eda86b96926',
     'Content-Type': 'application/json'
   }
 };
@@ -103,6 +103,24 @@ export const deleteCard = function(_id, card) {
   })
 };
 
+// Получение лайка карточки
+
+export const getUserLikes = function() {
+  return fetch(`${config.cohort}/cards/likes/${_id}`, {
+    method: 'GET',
+    headers: config.headers
+  })
+  .then((res) => {
+    if (res.ok) {
+      return res.json();
+    }
+    return Promise.reject(`${res.status}`);
+  })
+  .catch((err) => {
+    console.log(err);
+  })
+  };
+
 // Добавление лайка карточки
 
 export const addCardLike = function(_id) {
@@ -138,6 +156,27 @@ export const deleteCardLike = function(_id) {
     console.log(err);
   })
 };
+
+// // Обновление количества лайков
+
+// export const updateUserLikes = function() {
+//   return fetch(`${config.cohort}/users/me/avatar`, {
+//     method: 'PATCH',
+//     headers: config.headers,
+//     body: JSON.stringify({
+//       avatar
+//     })
+//   })
+//   .then((res) => {
+//     if (res.ok) {
+//       return res.json();
+//     }
+//     return Promise.reject(`${res.status}`);
+//   }) 
+//   .catch((err) => {
+//     console.log(err);
+//   })
+// };
 
 // Обновление аватара пользователя
 
