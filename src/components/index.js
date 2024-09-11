@@ -3,7 +3,7 @@ import '../pages/index.css';
 import { openModal, closeModal } from './modal.js';
 import { likeButton, createCard } from './card.js';
 import { validationConfig, enableValidation, clearValidation } from './validation.js';
-import { getUserInfo, updateUserInfo, getCardsInfo, addNewCard, deleteCard, getUserAvatar, getUserLikes } from './api.js';
+import { getUserInfo, updateUserInfo, getCardsInfo, addNewCard, deleteCard, getUserAvatar } from './api.js';
 
 // Переменные
 

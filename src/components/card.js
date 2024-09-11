@@ -1,5 +1,5 @@
-import { container } from "./index.js";
-import { deleteCardLike, addCardLike, getUserLikes } from "./api.js";
+import { container } from './index.js';
+import { deleteCardLike, addCardLike, checkUserLikes } from './api.js';
 
 // Функция создания карточки
 
@@ -51,11 +51,11 @@ export function createCard(item, deleteCard, likeButton, openPopupImage, userId)
 
 export const likeButton = function(cardLikeCounter, cardLikeButton, item) {
 
-  if (cardLikeButton.classList.contains("card__like-button_is-active")) {
+  if (cardLikeButton.classList.contains('card__like-button_is-active')) {
     deleteCardLike(item._id)
     .then((res) => {
       if (res) {
-        cardLikeButton.classList.toggle("card__like-button_is-active");
+        cardLikeButton.classList.toggle('card__like-button_is-active');
         cardLikeCounter.textContent = res.likes.length;
       }
     })
@@ -66,7 +66,7 @@ export const likeButton = function(cardLikeCounter, cardLikeButton, item) {
     addCardLike(item._id)
     .then((res) => {
       if (res) {
-        cardLikeButton.classList.toggle("card__like-button_is-active");
+        cardLikeButton.classList.toggle('card__like-button_is-active');
         cardLikeCounter.textContent = res.likes.length;
       }
     })

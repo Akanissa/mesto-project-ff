@@ -66,7 +66,7 @@ export const getCardsInfo = function() {
   })
 };
 
-// Добавление новой карточки на сервер//////////////
+// Добавление новой карточки на сервер
 
 export const addNewCard = function(name, link) {
   return fetch(`${config.cohort}/cards`, {
@@ -103,24 +103,6 @@ export const deleteCard = function(_id, card) {
   })
 };
 
-// Получение лайка карточки
-
-export const getUserLikes = function() {
-  return fetch(`${config.cohort}/cards/likes/${_id}`, {
-    method: 'GET',
-    headers: config.headers
-  })
-  .then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`${res.status}`);
-  })
-  .catch((err) => {
-    console.log(err);
-  })
-  };
-
 // Добавление лайка карточки
 
 export const addCardLike = function(_id) {
@@ -156,27 +138,6 @@ export const deleteCardLike = function(_id) {
     console.log(err);
   })
 };
-
-// // Обновление количества лайков
-
-// export const updateUserLikes = function() {
-//   return fetch(`${config.cohort}/users/me/avatar`, {
-//     method: 'PATCH',
-//     headers: config.headers,
-//     body: JSON.stringify({
-//       avatar
-//     })
-//   })
-//   .then((res) => {
-//     if (res.ok) {
-//       return res.json();
-//     }
-//     return Promise.reject(`${res.status}`);
-//   }) 
-//   .catch((err) => {
-//     console.log(err);
-//   })
-// };
 
 // Обновление аватара пользователя
 
