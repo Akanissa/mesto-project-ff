@@ -1,5 +1,5 @@
 import { container } from './index.js';
-import { deleteCardLike, addCardLike, checkUserLikes } from './api.js';
+import { deleteCardLike, addCardLike } from './api.js';
 
 // Функция создания карточки
 
@@ -15,26 +15,30 @@ export function createCard(item, deleteCard, likeButton, openPopupImage, userId)
   cardImage.src = item.link;
   card.alt = item.name;
   cardTitle.textContent = item.name;
-
-  if (item.likes) {
-    cardLikeCounter.textContent = item.likes.length;
-  } else {
-    cardLikeCounter.textContent = 0;
-  }
     
   const deleteButton = card.querySelector('.card__delete-button');
   
   card.dataset.id = item._id;
 
-  if (item.owner._id === userId) {
+  if (item.owner._id === userId) {                                // Если id пользователя и владельца карточки совпадают, то ее можно удалить 
     deleteButton.addEventListener('click', function() {
       deleteCard(item._id, card);
     });
-  } else {
+  } else {                                                       // Если id пользователя и владельца карточки не совпадают, удаление недоступно
     deleteButton.style.display = 'none';
   }
     
   const cardLikeButton = card.querySelector('.card__like-button');
+
+  if (item.likes) {
+    cardLikeCounter.textContent = item.likes.length;              // Отображение нынешнего количества лайков
+  } 
+  
+  if (item.likes.some(like => like._id === userId)) {              // Проверка на наличие нажатого лайка
+    cardLikeButton.classList.add('card__like-button_is-active');
+  } else {
+    cardLikeCounter.textContent = item.likes.length;
+  }
 
   cardLikeButton.addEventListener('click', function() {
     likeButton(cardLikeCounter, cardLikeButton, item);
@@ -56,7 +60,7 @@ export const likeButton = function(cardLikeCounter, cardLikeButton, item) {
     .then((res) => {
       if (res) {
         cardLikeButton.classList.toggle('card__like-button_is-active');
-        cardLikeCounter.textContent = res.likes.length;
+       return cardLikeCounter.textContent = res.likes.length;
       }
     })
     .catch((err) => {
