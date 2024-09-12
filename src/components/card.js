@@ -25,7 +25,7 @@ export function createCard(item, deleteCard, likeButton, openPopupImage, userId)
       deleteCard(item._id, card);
     });
   } else {                                                       // Если id пользователя и владельца карточки не совпадают, удаление недоступно
-    deleteButton.style.display = 'none';
+    deleteButton.remove(deleteButton);
   }
     
   const cardLikeButton = card.querySelector('.card__like-button');

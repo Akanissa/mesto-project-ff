@@ -20,7 +20,6 @@ export const validationConfig = {
 // Переменные
 
 const popups = document.querySelectorAll('.popup');
-const popupForm = document.querySelector('.popup__form');
 const buttonEditProfile = document.querySelector('.profile__edit-button');
 const profilePopup = document.querySelector('.popup_type_edit');
 const buttonsClosePopup = document.querySelectorAll('.popup__close');
@@ -33,11 +32,11 @@ const formEditProfile = document.forms['edit-profile'];
 const cardNameInput = document.querySelector('.popup__input_type_card-name');
 const cardLinkInput = document.querySelector('.popup__input_type_url');
 const formAddProfile = document.forms['new-place'];
-const popupImage = document.querySelector('.popup_type_image');
+const popupTypeImage = document.querySelector('.popup_type_image');
 const nameTitle = document.querySelector('.profile__title');
 const jobTitle = document.querySelector('.profile__description');
-const image = document.querySelector('.popup__image');
-const name = document.querySelector('.popup__caption');
+const popupImage = document.querySelector('.popup__image');
+const popupName = document.querySelector('.popup__caption');
 const avatarImage = document.querySelector('.profile__image');
 const avatarPopup = document.querySelector('.popup_type_avatar');
 const formAvatar = document.forms['edit-avatar'];
@@ -55,22 +54,21 @@ const cardList = document.querySelector('.places__list');
 // Слушатели открытия модального окна
 
 buttonEditProfile.addEventListener('click', function() {
-  clearValidation(formEditProfile, validationConfig);
-  openModal(profilePopup);
   nameInput.value = nameTitle.textContent;
   jobInput.value = jobTitle.textContent;
+  openModal(profilePopup);
+  clearValidation(formEditProfile, validationConfig);
 });
 
 buttonAddProfile.addEventListener('click', function() {
-  clearValidation(newCardPopup, validationConfig);
-  cardNameInput.value = "";
-  cardLinkInput.value = "";
+  formAddProfile.reset();                                     // Сброс содержимого инпутов у всей формы
   openModal(newCardPopup);
+  clearValidation(newCardPopup, validationConfig);
 });
 
 avatarImage.addEventListener('click', function() {
   clearValidation(avatarPopup, validationConfig);  
-  avatarUrlInput.value = "";
+  formAvatar.reset();                                         // Сброс содержимого инпутов у всей формы
   openModal(avatarPopup);
 });
 
@@ -78,11 +76,11 @@ avatarImage.addEventListener('click', function() {
 
 function openPopupImage(item) {
 
-  name.textContent = item.name;
-  image.src = item.link;
-  image.alt = item.name;
+  popupName.textContent = item.name;
+  popupImage.src = item.link;
+  popupImage.alt = item.name;
 
-  openModal(popupImage);
+  openModal(popupTypeImage);
 }
 
 // Слушатели закрытия модального окна
@@ -122,31 +120,28 @@ popupsContent.forEach(function(item) {
 // Редактирование имени и информации о себе
 
 function handleFormEditProfile(evt) {
-  evt.preventDefault(); // Эта строчка отменяет стандартную отправку формы.
+  evt.preventDefault();                            // Эта строчка отменяет стандартную отправку формы.
 
   const nameValue = nameInput.value;
-  const jobValue = jobInput.value; // Получите значение полей jobInput и nameInput из свойства value
-    
-  nameTitle.textContent = nameValue; // Вставьте новые значения с помощью textContent
-  jobTitle.textContent = jobValue;
+  const jobValue = jobInput.value;                 // Получите значение полей jobInput и nameInput из свойства value
 
   changeButtonText(profilePopup, 'Сохранение...'); // Изменение текста кнопки нажатии на кнопку и загрузке
 
-  updateUserInfo(nameValue, jobValue) // Обновление данных  после нажатия кнопки 'Сохранить' и вывод их в консоль
+  updateUserInfo(nameValue, jobValue)              // Обновление данных  после нажатия кнопки 'Сохранить' и вывод их в консоль
     .then((userInfo) => {
       userInfo.name = nameTitle.textContent;
       userInfo.about = jobTitle.textContent;
       console.log('Данные пользователя обновлены:', userInfo);
-      changeButtonText(profilePopup, 'Сохранить'); // Изменение текста кнопки после загрузки
+      nameTitle.textContent = nameValue;           // Вставьте новые значения с помощью textContent
+      jobTitle.textContent = jobValue;
+      closeModal(profilePopup);
     })
     .catch((err) => {
       console.log(`Ошибка обновления данных: ${err}`);
     })
     .finally(() => {
-      changeButtonText(profilePopup, 'Сохранить');
+      changeButtonText(profilePopup, 'Сохранить');  // Изменение текста кнопки независимо от ответа сервера
     });
-
-  closeModal(profilePopup);
 }
 
 formEditProfile.addEventListener('submit', handleFormEditProfile);
@@ -172,13 +167,12 @@ function handleFormAddCard(evt) {
     cardList.prepend(newCard);
     formAddProfile.reset();
     closeModal(newCardPopup);
-    changeButtonText(newCardPopup, 'Создать');
   })
   .catch((err) => {
     console.log(`Ошибка добавления данных: ${err}`);
   })
   .finally(() => {
-    changeButtonText(newCardPopup, 'Создать');
+    changeButtonText(newCardPopup, 'Создать');   // Изменение текста кнопки независимо от ответа сервера
   });
 };
 
@@ -197,16 +191,14 @@ function updateAvatar(evt) {
     .then((userInfo) => {
       avatarImage.style.backgroundImage = `url(${userInfo.avatar})`;
       console.log('Аватар пользователя обновлен:', userInfo);
-      changeButtonText(avatarPopup, 'Сохранить');
+      closeModal(avatarPopup);
     })  
     .catch((err) => {
       console.log(err);
     })
     .finally(() => {
-      changeButtonText(avatarPopup, 'Сохранить');
+      changeButtonText(avatarPopup, 'Сохранить');   // Изменение текста кнопки независимо от ответа сервера
     });
-
-  closeModal(avatarPopup);
 
   enableValidation(validationConfig);
 }
