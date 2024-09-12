@@ -8,6 +8,15 @@ const config = {
   }
 };
 
+// Проверка ответа сервера и преобразование из json
+
+const getResponseData = function(res) {
+  if (res.ok) {
+    return res.json();
+  }
+  return Promise.reject(`${res.status}`);
+}
+
 // Загрузка информации о пользователе с сервера
 
 export const getUserInfo = function() {
@@ -15,15 +24,7 @@ export const getUserInfo = function() {
     method: 'GET',
     headers: config.headers
   })
-  .then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`${res.status}`);
-  })
-  .catch((err) => {
-    console.log(err);
-  })
+  .then(getResponseData);
 };
 
 // Обновление данных пользователя на сервере
@@ -37,15 +38,7 @@ export const updateUserInfo = function(name, about) {
       about
     })
   })
-  .then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`${res.status}`);
-  })
-  .catch((err) => {
-    console.log(err);
-  })
+  .then(getResponseData);
 };
 
 // Загрузка карточек с сервера
@@ -55,15 +48,7 @@ export const getCardsInfo = function() {
     method: 'GET',
     headers: config.headers
   })
-  .then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`${res.status}`);
-  })
-  .catch((err) => {
-    console.log(err);
-  })
+  .then(getResponseData);
 };
 
 // Добавление новой карточки на сервер
@@ -77,15 +62,7 @@ export const addNewCard = function(name, link) {
       link
     })
   })
-  .then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`${res.status}`);
-  })
-  .catch((err) => {
-    console.log(err);
-  })
+  .then(getResponseData);
 };
 
   // удаление карточки по id
@@ -97,10 +74,7 @@ export const deleteCard = function(_id, card) {
   })
   .then(() => {
     card.remove();
-  })
-  .catch((err) => {
-    console.log(err);
-  })
+  });
 };
 
 // Добавление лайка карточки
@@ -110,15 +84,7 @@ export const addCardLike = function(_id) {
     method: 'PUT', 
     headers: config.headers
   })
-  .then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`${res.status}`);
-  })
-  .catch((err) => {
-    console.log(err);
-  })
+  .then(getResponseData);
 };
   
 // Удаление лайка карточки
@@ -128,15 +94,7 @@ export const deleteCardLike = function(_id) {
     method: 'DELETE', 
     headers: config.headers
   })
-  .then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`${res.status}`);
-  })
-  .catch((err) => {
-    console.log(err);
-  })
+  .then(getResponseData);
 };
 
 // Обновление аватара пользователя
@@ -149,13 +107,5 @@ export const getUserAvatar = function(avatar) {
       avatar
     })
   })
-  .then((res) => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`${res.status}`);
-  }) 
-  .catch((err) => {
-    console.log(err);
-  })
+  .then(getResponseData);
 };

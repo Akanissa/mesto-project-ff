@@ -2,8 +2,20 @@
 import '../pages/index.css';
 import { openModal, closeModal } from './modal.js';
 import { likeButton, createCard } from './card.js';
-import { validationConfig, enableValidation, clearValidation } from './validation.js';
+import { enableValidation, clearValidation } from './validation.js';
 import { getUserInfo, updateUserInfo, getCardsInfo, addNewCard, deleteCard, getUserAvatar } from './api.js';
+
+// Объект с переменными валидации
+
+export const validationConfig = {
+
+  formSelector: '.popup__form',
+  inputSelector: '.popup__input',
+  submitButtonSelector: '.popup__button',
+  inactiveButtonClass: 'popup__button_disabled',
+  inputErrorClass: 'popup__input_type-error',
+  errorClass: 'popup__error_visible'
+};
 
 // Переменные
 
@@ -128,7 +140,9 @@ function handleFormEditProfile(evt) {
       changeButtonText(profilePopup, 'Сохранить'); // Изменение текста кнопки после загрузки
     })
     .catch((err) => {
-      console.log(err);
+      console.log(`Ошибка обновления данных: ${err}`);
+    })
+    .finally(() => {
       changeButtonText(profilePopup, 'Сохранить');
     });
 
@@ -161,10 +175,12 @@ function handleFormAddCard(evt) {
     changeButtonText(newCardPopup, 'Создать');
   })
   .catch((err) => {
-    console.log(err);
+    console.log(`Ошибка добавления данных: ${err}`);
+  })
+  .finally(() => {
     changeButtonText(newCardPopup, 'Создать');
   });
-}
+};
 
 formAddProfile.addEventListener('submit', handleFormAddCard);
 
@@ -185,19 +201,21 @@ function updateAvatar(evt) {
     })  
     .catch((err) => {
       console.log(err);
+    })
+    .finally(() => {
       changeButtonText(avatarPopup, 'Сохранить');
     });
 
   closeModal(avatarPopup);
 
-  enableValidation();
+  enableValidation(validationConfig);
 }
 
 formAvatar.addEventListener('submit', updateAvatar);
 
 // Вызов функции валидации
 
-enableValidation();
+enableValidation(validationConfig);
 
 // Функция: при нажатии в попапе кнопки 'Сохранить' текст меняется на 'Сохранение...'
 
@@ -227,5 +245,5 @@ Promise.all(promises)
   console.log({ userInfo, cardsInfo });
 })
 .catch((err) => {
-  console.log(err);
-});
+  console.log(`Ошибка получения данных: ${err}`);
+})

@@ -64,7 +64,7 @@ export const likeButton = function(cardLikeCounter, cardLikeButton, item) {
       }
     })
     .catch((err) => {
-      console.log(err);
+      console.log(`Ошибка: ${err}`);
     })
   } else {
     addCardLike(item._id)
@@ -75,7 +75,7 @@ export const likeButton = function(cardLikeCounter, cardLikeButton, item) {
       }
     })
     .catch((err) => {
-      console.log(err);
+      console.log(`Ошибка: ${err}`);
     });
   }
 };
