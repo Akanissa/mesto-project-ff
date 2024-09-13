@@ -66,10 +66,10 @@ buttonAddProfile.addEventListener('click', function() {
   clearValidation(newCardPopup, validationConfig);
 });
 
-avatarImage.addEventListener('click', function() {
-  clearValidation(avatarPopup, validationConfig);  
+avatarImage.addEventListener('click', function() {  
   formAvatar.reset();                                         // Сброс содержимого инпутов у всей формы
   openModal(avatarPopup);
+  clearValidation(avatarPopup, validationConfig);
 });
 
 // Функция открытия модального окна с картинкой
@@ -129,11 +129,9 @@ function handleFormEditProfile(evt) {
 
   updateUserInfo(nameValue, jobValue)              // Обновление данных  после нажатия кнопки 'Сохранить' и вывод их в консоль
     .then((userInfo) => {
-      userInfo.name = nameTitle.textContent;
-      userInfo.about = jobTitle.textContent;
+      nameTitle.textContent = userInfo.name           // Вставьте новые значения с помощью textContent
+      jobTitle.textContent = userInfo.about
       console.log('Данные пользователя обновлены:', userInfo);
-      nameTitle.textContent = nameValue;           // Вставьте новые значения с помощью textContent
-      jobTitle.textContent = jobValue;
       closeModal(profilePopup);
     })
     .catch((err) => {
